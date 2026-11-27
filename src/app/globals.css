@@ -206,6 +206,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .outfit-chevron { color: var(--muted); }
 .outfit[open] .outfit-chevron { transform: rotate(180deg); }
 .outfit-content { padding: 0 15px 16px; }
+.outfit-actions { display: flex; justify-content: flex-end; margin-top: 8px; }
 .outfit-note { white-space: pre-wrap; overflow-wrap: anywhere; padding: 8px 12px; margin-bottom: 12px; border-left: 3px solid #d6c0ee; background: #faf7fd; }
 .outfit-photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; }
 .outfit-photos li { min-width: 0; border: 1px solid var(--line); border-radius: 11px; overflow: hidden; }

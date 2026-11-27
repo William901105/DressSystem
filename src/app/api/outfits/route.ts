@@ -19,3 +19,11 @@ export const POST = api(async (request) => {
   ensureSuccess(error);
   return json({ id: data }, 201);
 });
+
+export const DELETE = api(async (request) => {
+  const input = await body(request);
+  const outfitId = id(input.id);
+  const { error } = await database().from("outfits").delete().eq("id", outfitId);
+  ensureSuccess(error);
+  return json({ ok: true });
+});
