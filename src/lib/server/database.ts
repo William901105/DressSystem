@@ -66,7 +66,7 @@ export function ensureSuccess(error: { code: string; message: string } | null, f
         case "outfit_selection_invalid":
           throw new ApiError(400, "請重新選擇穿搭衣物。");
         case "outfit_item_unavailable":
-          throw new ApiError(409, "部分衣物已封存，請重新整理後再選擇。");
+          throw new ApiError(409, "部分衣物已封存或刪除，請重新整理後再選擇。");
         case "outfit_id_conflict":
           throw new ApiError(409, "這張穿搭單已送出，請到穿搭紀錄查看。");
       }

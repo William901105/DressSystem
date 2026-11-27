@@ -99,6 +99,7 @@ function GarmentEditor({ garment, categories, initialCategory, onClose, onSaved 
   const [preview, setPreview] = useState("");
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const ticket = useRef<UploadTicket | null>(null);
   const stored = useRef(false);
   const camera = useRef<HTMLInputElement>(null);
@@ -174,6 +175,42 @@ function GarmentEditor({ garment, categories, initialCategory, onClose, onSaved 
     }
   }
 
+  async function deleteGarment() {
+    if (!garment || busy) return;
+    setBusy("正在刪除…");
+    setError("");
+    try {
+      await send("/api/clothes", "DELETE", { id: garment.id });
+      onSaved("衣物已刪除。");
+    } catch (cause) {
+      setError(errorMessage(cause));
+    } finally {
+      setBusy("");
+    }
+  }
+
+  function cancelDelete() {
+    setConfirmDelete(false);
+    setError("");
+  }
+
+  if (garment && confirmDelete) {
+    return (
+      <Modal key="delete" title="刪除衣物" busy={Boolean(busy)} onClose={cancelDelete}>
+        <div className="stack">
+          <p>確定要永久刪除「{garment.name}」？已存的穿搭紀錄會保留當時的衣物資訊。</p>
+          {error && <Notice error>{error}</Notice>}
+          <div className="modal-actions">
+            <button className="button secondary" type="button" autoFocus disabled={Boolean(busy)} onClick={cancelDelete}>取消</button>
+            <button className="button danger" type="button" disabled={Boolean(busy)} onClick={deleteGarment}>
+              {busy || "永久刪除"}
+            </button>
+          </div>
+        </div>
+      </Modal>
+    );
+  }
+
   return (
     <Modal title={garment ? "編輯衣物" : "新增衣物"} busy={Boolean(busy)} onClose={onClose}>
       <form onSubmit={submit} className="stack">
@@ -206,6 +243,10 @@ function GarmentEditor({ garment, categories, initialCategory, onClose, onSaved 
         <div className="modal-actions">
           {garment && <button className="button quiet" type="button" disabled={Boolean(busy)} onClick={archive}>
             {garment.archived_at ? "移回衣櫃" : "封存衣物"}
+          </button>}
+          {garment && <button className="button secondary" type="button" disabled={Boolean(busy)}
+            onClick={() => { setError(""); setConfirmDelete(true); }}>
+            刪除衣物
           </button>}
           <button className="button primary" type="submit" disabled={Boolean(busy) || (!garment && !photo) || !name.trim() || !categoryId}>
             {busy || (garment ? "儲存變更" : "加入衣櫃")}

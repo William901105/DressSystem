@@ -49,3 +49,11 @@ export const PATCH = api(async (request) => {
   if (!data) throw new ApiError(404, "找不到這件衣物。");
   return data;
 });
+
+export const DELETE = api(async (request) => {
+  const input = await body(request);
+  const garmentId = id(input.id);
+  const { error } = await database().from("clothes").delete().eq("id", garmentId);
+  ensureSuccess(error);
+  return json({ ok: true });
+});
