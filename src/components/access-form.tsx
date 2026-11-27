@@ -5,7 +5,10 @@ import { useState, type FormEvent } from "react";
 import { errorMessage, send } from "@/lib/client";
 import { Notice } from "./ui";
 
-export function AccessForm({ configured }: { configured: boolean }) {
+export function AccessForm({ configured, setup }: {
+  configured: boolean;
+  setup?: { message: string; variables?: string[] };
+}) {
   const [code, setCode] = useState("");
   const [visible, setVisible] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -35,8 +38,15 @@ export function AccessForm({ configured }: { configured: boolean }) {
             <span className="brand-mark"><Shirt size={23} aria-hidden="true" /></span>
             <span>DressSystem</span>
           </div>
-          <h1>開啟我的衣櫃</h1>
-          {configured ? (
+          <h1>{setup ? "完成衣櫃設定" : "開啟我的衣櫃"}</h1>
+          {setup ? (
+            <div className="stack">
+              <p>存取碼驗證成功。</p>
+              <Notice>{setup.message}</Notice>
+              {setup.variables && <ul>{setup.variables.map((variable) => <li key={variable}><code>{variable}</code></li>)}</ul>}
+              <a className="button secondary" href="/">重新檢查</a>
+            </div>
+          ) : configured ? (
             <form className="stack" onSubmit={submit}>
               <label htmlFor="access-code">衣櫃存取碼</label>
               <div className="password-field">
@@ -52,7 +62,7 @@ export function AccessForm({ configured }: { configured: boolean }) {
                 <LockKeyhole size={18} aria-hidden="true" />{busy ? "正在開啟…" : "開啟衣櫃"}
               </button>
             </form>
-          ) : <Notice>請先設定 Supabase 連線與衣櫃存取碼。</Notice>}
+          ) : <Notice>請確認 Vercel Production 已設定 DRESS_ACCESS_CODE，並重新部署。</Notice>}
         </div>
       </section>
     </main>

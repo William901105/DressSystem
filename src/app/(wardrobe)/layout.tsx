@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
 import { Navigation } from "@/components/navigation";
-import { requirePageAccess } from "@/lib/server/access";
+import { requireWardrobeAccess } from "@/lib/server/database";
 
 export const dynamic = "force-dynamic";
 
 export default async function WardrobeLayout({ children }: { children: ReactNode }) {
-  await requirePageAccess();
+  await requireWardrobeAccess();
   return (
     <div className="shell">
       <Navigation />

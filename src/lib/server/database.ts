@@ -1,13 +1,56 @@
 import "server-only";
 
 import { createClient } from "@supabase/supabase-js";
+import { redirect } from "next/navigation";
 import { PHOTO_BUCKET } from "@/lib/models";
-import { configuration } from "./access";
+import { requirePageAccess } from "./access";
 import { ApiError } from "./api";
 
+function supabaseOrigin(value: string | undefined) {
+  if (!value) return null;
+  try {
+    const url = new URL(value.trim());
+    if (url.protocol === "https:" || (url.protocol === "http:" && ["localhost", "127.0.0.1"].includes(url.hostname))) {
+      return url.origin;
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+function supabaseKey(value: string | undefined, prefix: string) {
+  const key = value?.trim();
+  return key && key.startsWith(prefix) && key.length > prefix.length ? key : null;
+}
+
+export function databaseSettings() {
+  const url = supabaseOrigin(process.env.NEXT_PUBLIC_SUPABASE_URL);
+  const publishableKey = supabaseKey(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, "sb_publishable_");
+  const secretKey = supabaseKey(process.env.SUPABASE_SECRET_KEY, "sb_secret_");
+  return {
+    config: url && publishableKey && secretKey ? { url, publishableKey, secretKey } : null,
+    invalid: [
+      ...(!url ? ["NEXT_PUBLIC_SUPABASE_URL"] : []),
+      ...(!publishableKey ? ["NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"] : []),
+      ...(!secretKey ? ["SUPABASE_SECRET_KEY"] : []),
+    ],
+  };
+}
+
+export function requireDatabaseSettings() {
+  const { config } = databaseSettings();
+  if (!config) throw new ApiError(503, "Supabase 連線設定尚未完成，請檢查 Vercel Production 環境變數。");
+  return config;
+}
+
+export async function requireWardrobeAccess() {
+  await requirePageAccess();
+  if (!databaseSettings().config) redirect("/access");
+}
+
 export function database() {
-  const config = configuration();
-  if (!config) throw new ApiError(503, "DressSystem 尚待完成伺服器設定。");
+  const config = requireDatabaseSettings();
   return createClient(config.url, config.secretKey, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
     global: { fetch: (input, init) => fetch(input, { ...init, cache: "no-store" }) },
@@ -20,6 +63,12 @@ export function photos(db: ReturnType<typeof database>) {
 
 export function photoPath(id: string) {
   return `clothes/${id}.jpg`;
+}
+
+export function ensureWardrobeRead(error: { code: string; message: string } | null, status: number) {
+  if (error?.code === "PGRST205" || error?.code === "42P01") redirect("/access?setup=schema");
+  if (error && ([401, 403].includes(status) || error.code === "42501")) redirect("/access?setup=credentials");
+  ensureSuccess(error);
 }
 
 export function ensureSuccess(error: { code: string; message: string } | null, foreignKeyMessage?: string) {

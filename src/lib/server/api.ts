@@ -1,7 +1,7 @@
 import "server-only";
 
 import { NextResponse } from "next/server";
-import { configuration, hasAccess } from "./access";
+import { hasAccess } from "./access";
 
 export class ApiError extends Error {
   constructor(readonly status: number, message: string) {
@@ -29,7 +29,6 @@ function sameOrigin(request: Request) {
 export function api(handler: (request: Request) => Promise<unknown>, options = { protected: true }) {
   return async (request: Request) => {
     try {
-      if (!configuration()) throw new ApiError(503, "DressSystem 尚待完成伺服器設定。");
       if (options.protected && !(await hasAccess())) throw new ApiError(401, "請重新輸入衣櫃存取碼。");
       if (!["GET", "HEAD"].includes(request.method) && !sameOrigin(request)) throw new ApiError(403, "此請求來源無法使用。");
       const result = await handler(request);

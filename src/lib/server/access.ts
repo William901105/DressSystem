@@ -7,23 +7,9 @@ import { redirect } from "next/navigation";
 export const ACCESS_COOKIE = "dress_access";
 export const ACCESS_SECONDS = 60 * 60 * 24 * 30;
 
-export function configuration() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim();
-  const secretKey = process.env.SUPABASE_SECRET_KEY?.trim();
-  const accessCode = process.env.DRESS_ACCESS_CODE;
-  if (!url || !publishableKey?.startsWith("sb_publishable_") || !secretKey?.startsWith("sb_secret_")
-    || !accessCode || accessCode.length < 20 || accessCode.length > 256) return null;
-
-  try {
-    const parsed = new URL(url);
-    if (parsed.protocol === "https:" || (parsed.protocol === "http:" && ["localhost", "127.0.0.1"].includes(parsed.hostname))) {
-      return { url: parsed.origin, publishableKey, secretKey, accessCode };
-    }
-  } catch {
-    return null;
-  }
-  return null;
+export function configuredAccessCode() {
+  const value = process.env.DRESS_ACCESS_CODE?.trim();
+  return value && value.length >= 20 && value.length <= 256 ? value : null;
 }
 
 function digest(value: string) {
@@ -51,9 +37,9 @@ export function validAccess(value: string | undefined, secret: string) {
 }
 
 export async function hasAccess() {
-  const config = configuration();
-  if (!config) return false;
-  return validAccess((await cookies()).get(ACCESS_COOKIE)?.value, config.accessCode);
+  const code = configuredAccessCode();
+  if (!code) return false;
+  return validAccess((await cookies()).get(ACCESS_COOKIE)?.value, code);
 }
 
 export async function requirePageAccess() {

@@ -29,6 +29,8 @@ node -e "console.log(require('node:crypto').randomBytes(24).toString('base64url'
 3. 在 **Settings → Environment Variables** 設定上述四個值。Production 必須有一份設定，Preview 可使用獨立的 Supabase 專案與存取碼。
 4. 部署後用手機的 HTTPS 網址測試相機與相簿上傳。
 
+如果存取頁提示設定 `DRESS_ACCESS_CODE`，請確認該變數已加入正確的 Vercel 專案與 Production 環境，並在儲存後重新部署。存取碼驗證成功後，若頁面列出 Supabase 變數，請補齊這些項目後重新部署。若顯示衣櫃資料表尚未就緒，請在相同的 Supabase 專案執行初始資料庫遷移。
+
 ## 驗收
 
 - 執行 `npm run typecheck` 與 `npm run build`。

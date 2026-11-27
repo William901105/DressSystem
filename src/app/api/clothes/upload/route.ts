@@ -1,7 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { configuration } from "@/lib/server/access";
 import { api, ApiError, body, json } from "@/lib/server/api";
-import { database, ensureSuccess, photoPath, photos } from "@/lib/server/database";
+import { database, ensureSuccess, photoPath, photos, requireDatabaseSettings } from "@/lib/server/database";
 import { PHOTO_MAX_BYTES, type UploadTicket } from "@/lib/models";
 
 async function cleanExpired(db: ReturnType<typeof database>) {
@@ -20,7 +19,7 @@ export const POST = api(async (request) => {
     throw new ApiError(400, "照片大小須在 3 MB 以內。");
   }
 
-  const config = configuration()!;
+  const config = requireDatabaseSettings();
   const db = database();
   try {
     await cleanExpired(db);
