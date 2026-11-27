@@ -13,6 +13,7 @@ export type Garment = {
   name: string;
   category_id: string;
   archived_at: string | null;
+  selection_count: number;
   photoUrl: string;
 };
 

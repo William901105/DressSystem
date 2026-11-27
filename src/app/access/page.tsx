@@ -21,7 +21,7 @@ export default async function AccessPage({ searchParams }: {
   }
   if (setup === "schema") {
     return <AccessForm configured setup={{
-      message: "衣櫃資料表尚未就緒。請在這個 Supabase 專案的 SQL Editor 執行 DressSystem 的初始資料庫遷移。",
+      message: "衣櫃資料表尚未就緒。請在這個 Supabase 專案的 SQL Editor 依序套用 DressSystem 尚未執行的資料庫遷移。",
     }} />;
   }
   if (setup === "credentials") {

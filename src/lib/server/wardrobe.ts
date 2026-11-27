@@ -31,7 +31,9 @@ export async function readCategories() {
 export async function readWardrobe(includeArchived = false) {
   await requireWardrobeAccess();
   const db = database();
-  const query = db.from("clothes").select("id,name,category_id,archived_at,photo_path").order("created_at", { ascending: false });
+  const query = db.from("clothes_with_popularity")
+    .select("id,name,category_id,archived_at,photo_path,selection_count")
+    .order("created_at", { ascending: false });
   if (!includeArchived) query.is("archived_at", null);
   const [categoryList, { data, error, status }] = await Promise.all([categories(db), query]);
   ensureWardrobeRead(error, status);

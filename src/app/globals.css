@@ -96,6 +96,23 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .filter { min-height: 40px; max-width: 100%; padding: 7px 15px; overflow-wrap: anywhere; border-radius: 24px; border-color: var(--line); background: var(--surface); color: var(--muted); font-weight: 650; }
 .filter:hover { background: var(--accent-soft); }
 .filter[aria-pressed="true"] { background: var(--accent-soft); border-color: #dfcdf5; color: var(--accent-dark); }
+.garment-toolbar { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px 14px; margin-bottom: 18px; }
+.garment-toolbar .filter-bar { flex: 1 1 160px; margin-bottom: 0; }
+.popularity-sort {
+  appearance: none;
+  min-height: 40px;
+  margin-inline-start: auto;
+  padding: 7px 32px 7px 11px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--muted);
+  background-color: var(--surface);
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 17px) center, calc(100% - 12px) center;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+  font-size: .9rem;
+}
 .list-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; color: var(--muted); font-size: .9rem; }
 .segmented { display: flex; gap: 2px; padding: 3px; background: #eeeaf2; border-radius: 10px; }
 .segmented button { min-height: 36px; padding: 5px 10px; border-radius: 8px; background: transparent; color: var(--muted); font-size: .86rem; font-weight: 650; }
@@ -113,6 +130,23 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .garment-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 15px; }
 .garment-card { min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 15px; overflow: hidden; }
 .garment-image { position: relative; aspect-ratio: 1 / 1; overflow: hidden; background: #eee9f2; }
+.garment-popularity { display: grid; justify-items: center; padding: 8px 8px 0; }
+.selection-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  padding-inline: .35rem;
+  aspect-ratio: 1;
+  border: 1px solid #dfcdf5;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  font-size: .9rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
 .photo { display: block; width: 100%; height: 100%; object-fit: cover; }
 .photo-fallback { display: grid; width: 100%; height: 100%; place-items: center; color: var(--muted); background: #eee9f2; }
 .garment-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 11px 12px; text-align: left; }

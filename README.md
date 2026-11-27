@@ -5,7 +5,7 @@
 ## 本機啟動
 
 1. 使用 Node.js 22。執行 `npm install`，將 `.env.example` 複製為 `.env.local`。
-2. 建立 Supabase 專案。在該專案的 **SQL Editor** 執行一次 [初始資料庫遷移](supabase/migrations/20261127000000_create_wardrobe.sql)。遷移會建立資料表、資料權限、私人照片儲存空間與預設分類。
+2. 建立 Supabase 專案。在該專案的 **SQL Editor** 依檔名順序，各執行一次 [資料庫遷移](supabase/migrations)。遷移會建立資料表、資料權限、私人照片儲存空間、預設分類與衣物挑選次數查詢。
 3. 在 `.env.local` 填寫下列設定。
 4. 在 Supabase Authentication 建立已確認的電子郵件與密碼帳號，用 Auth Admin API 將帳號的 `app_metadata.dresssystem_member` 設為 `true`。
 5. 執行 `npm run dev`，開啟 [http://localhost:3000](http://localhost:3000)。
@@ -32,7 +32,7 @@
 - 執行 `npm run typecheck` 與 `npm run build`。
 - 輸入已授權的電子郵件和密碼。確認登出後回到登入頁，再登入新增兩個分類，確認可改名與調整排序。
 - 用手機各測一次拍照與相簿上傳。確認照片預覽、分類篩選和編輯衣物都可操作。
-- 從不同分類加入衣物，填寫名稱與備註後送出，確認穿搭紀錄能展開並顯示照片。
+- 從不同分類加入衣物，填寫名稱與備註後送出，確認穿搭紀錄能展開並顯示照片，已選衣物的挑選次數各加一。確認衣櫃與配穿搭能切換熱門程度排序。
 - 改名或封存穿搭單中的衣物，回看舊單核對當時的名稱、分類與照片。封存衣物可從衣櫃移回。
 
 照片會在瀏覽器縮圖並轉成 JPEG，再以簽名網址直傳到 Supabase。相簿可讀取的格式取決於使用的瀏覽器。照片簽名網址過期時可重新整理頁面。未儲存的過期上傳會在後續上傳時清理。

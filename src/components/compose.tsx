@@ -5,10 +5,12 @@ import Link from "next/link";
 import { useRef, useState, type FormEvent } from "react";
 import { errorMessage, send } from "@/lib/client";
 import { MAX_OUTFIT_ITEMS, type Category, type Garment } from "@/lib/models";
+import { PopularitySort, SelectionCount, sortByPopularity, type PopularityOrder } from "./garment-popularity";
 import { EmptyState, FilterBar, Modal, Notice, PageHeader, Photo } from "./ui";
 
 export function Compose({ categories, clothes }: { categories: Category[]; clothes: Garment[] }) {
   const [filter, setFilter] = useState("");
+  const [order, setOrder] = useState<PopularityOrder>("ascending");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [checkout, setCheckout] = useState(false);
   const [notice, setNotice] = useState("");
@@ -20,7 +22,10 @@ export function Compose({ categories, clothes }: { categories: Category[]; cloth
   });
   const selected = new Set(chosen.map(({ id }) => id));
   const currentFilter = labels.has(filter) ? filter : "";
-  const shown = currentFilter ? clothes.filter(({ category_id }) => category_id === currentFilter) : clothes;
+  const shown = sortByPopularity(
+    currentFilter ? clothes.filter(({ category_id }) => category_id === currentFilter) : clothes,
+    order,
+  );
 
   function toggle(id: string) {
     if (!selected.has(id) && selected.size >= MAX_OUTFIT_ITEMS) {
@@ -37,7 +42,10 @@ export function Compose({ categories, clothes }: { categories: Category[]; cloth
       {clothes.length ? (
         <div className="compose-layout">
           <section className="compose-list" aria-label="挑選衣物">
-            <FilterBar categories={categories} current={currentFilter} onChange={setFilter} />
+            <div className="garment-toolbar">
+              <FilterBar categories={categories} current={currentFilter} onChange={setFilter} />
+              <PopularitySort order={order} onChange={setOrder} />
+            </div>
             {notice && <Notice>{notice}</Notice>}
             {shown.length ? (
               <div className="garment-grid">
@@ -49,6 +57,7 @@ export function Compose({ categories, clothes }: { categories: Category[]; cloth
                         <Photo url={garment.photoUrl} name="" />
                         <span className="pick-mark">{checked ? <Check size={17} aria-hidden="true" /> : <Plus size={17} aria-hidden="true" />}</span>
                       </div>
+                      <SelectionCount count={garment.selection_count} />
                       <div className="garment-meta"><div><strong>{garment.name}</strong><p>{labels.get(garment.category_id)}</p></div></div>
                     </button>
                   );

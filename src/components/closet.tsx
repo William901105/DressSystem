@@ -7,17 +7,22 @@ import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "r
 import { errorMessage, RequestError, send } from "@/lib/client";
 import { preparePhoto, requestUpload, uploadPhoto } from "@/lib/client-photo";
 import type { Category, Garment, UploadTicket } from "@/lib/models";
+import { PopularitySort, SelectionCount, sortByPopularity, type PopularityOrder } from "./garment-popularity";
 import { EmptyState, FilterBar, Modal, Notice, PageHeader, Photo } from "./ui";
 
 export function Closet({ categories, clothes }: { categories: Category[]; clothes: Garment[] }) {
   const [filter, setFilter] = useState("");
+  const [order, setOrder] = useState<PopularityOrder>("ascending");
   const [archived, setArchived] = useState(false);
   const [editing, setEditing] = useState<Garment | "new" | null>(null);
   const [notice, setNotice] = useState("");
   const router = useRouter();
   const currentFilter = categories.some(({ id }) => id === filter) ? filter : "";
-  const filtered = clothes.filter((garment) =>
-    Boolean(garment.archived_at) === archived && (!currentFilter || garment.category_id === currentFilter),
+  const filtered = sortByPopularity(
+    clothes.filter((garment) =>
+      Boolean(garment.archived_at) === archived && (!currentFilter || garment.category_id === currentFilter),
+    ),
+    order,
   );
   const labels = new Map(categories.map(({ id, name }) => [id, name]));
 
@@ -40,7 +45,10 @@ export function Closet({ categories, clothes }: { categories: Category[]; clothe
           </button>
         )}
       </PageHeader>
-      <FilterBar categories={categories} current={currentFilter} onChange={setFilter} />
+      <div className="garment-toolbar">
+        <FilterBar categories={categories} current={currentFilter} onChange={setFilter} />
+        <PopularitySort order={order} onChange={setOrder} />
+      </div>
       <div className="list-toolbar">
         <span>{filtered.length} 件衣物</span>
         <div className="segmented" role="group" aria-label="衣物狀態">
@@ -54,6 +62,7 @@ export function Closet({ categories, clothes }: { categories: Category[]; clothe
           {filtered.map((garment) => (
             <article className="garment-card" key={garment.id}>
               <div className="garment-image"><Photo url={garment.photoUrl} name={garment.name} /></div>
+              <SelectionCount count={garment.selection_count} />
               <div className="garment-meta">
                 <div><h2>{garment.name}</h2><p>{labels.get(garment.category_id)}</p></div>
                 <button className="icon-button subtle" type="button" aria-label={`編輯${garment.name}`} onClick={() => setEditing(garment)}>
