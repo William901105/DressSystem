@@ -249,6 +249,11 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
   .page-heading h1 { font-size: clamp(1.6rem, 6.5vw, 2rem); }
   .page-heading p { font-size: .92rem; }
   .page-heading .button { padding-inline: 10px; font-size: .92rem; }
+  .garment-toolbar { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .garment-toolbar .filter-bar { flex-wrap: nowrap; overflow-x: auto; }
+  .garment-toolbar .filter { flex: 0 0 auto; max-width: none; padding-inline: 9px; white-space: nowrap; }
+  .garment-toolbar .filter:focus-visible { outline-offset: -3px; }
+  .garment-toolbar .popularity-sort { max-width: 100%; }
   .garment-grid, .compose-list .garment-grid { grid-template-columns: repeat(auto-fill, minmax(min(133px, 43vw), 1fr)); gap: 10px; }
   .garment-meta { padding: 9px; }
   .empty-state { min-height: 232px; padding: 24px 12px; }
