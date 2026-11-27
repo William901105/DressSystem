@@ -9,7 +9,8 @@ export function AccessForm({ configured, setup }: {
   configured: boolean;
   setup?: { message: string; variables?: string[] };
 }) {
-  const [code, setCode] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -19,7 +20,7 @@ export function AccessForm({ configured, setup }: {
     setBusy(true);
     setError("");
     try {
-      await send("/api/access", "POST", { code });
+      await send("/api/access", "POST", { email, password });
       window.location.replace("/");
     } catch (cause) {
       setError(errorMessage(cause));
@@ -38,31 +39,38 @@ export function AccessForm({ configured, setup }: {
             <span className="brand-mark"><Shirt size={23} aria-hidden="true" /></span>
             <span>DressSystem</span>
           </div>
-          <h1>{setup ? "完成衣櫃設定" : "開啟我的衣櫃"}</h1>
+          <h1>{setup ? "完成衣櫃設定" : "登入衣櫃"}</h1>
           {setup ? (
             <div className="stack">
-              <p>存取碼驗證成功。</p>
+              <p>登入成功。</p>
               <Notice>{setup.message}</Notice>
               {setup.variables && <ul>{setup.variables.map((variable) => <li key={variable}><code>{variable}</code></li>)}</ul>}
               <a className="button secondary" href="/">重新檢查</a>
             </div>
           ) : configured ? (
             <form className="stack" onSubmit={submit}>
-              <label htmlFor="access-code">衣櫃存取碼</label>
-              <div className="password-field">
-                <input id="access-code" type={visible ? "text" : "password"} autoComplete="current-password"
-                  maxLength={256} required value={code} onChange={(event) => setCode(event.target.value)} />
-                <button className="icon-button" type="button" aria-label={visible ? "隱藏存取碼" : "顯示存取碼"}
-                  onClick={() => setVisible(!visible)}>
-                  {visible ? <EyeOff size={20} aria-hidden="true" /> : <Eye size={20} aria-hidden="true" />}
-                </button>
+              <div className="field">
+                <label htmlFor="email">電子郵件</label>
+                <input id="email" name="email" type="email" autoComplete="username" autoCapitalize="none"
+                  spellCheck={false} maxLength={254} required value={email} onChange={(event) => setEmail(event.target.value)} />
+              </div>
+              <div className="field">
+                <label htmlFor="password">密碼</label>
+                <div className="password-field">
+                  <input id="password" name="password" type={visible ? "text" : "password"} autoComplete="current-password"
+                    maxLength={256} required value={password} onChange={(event) => setPassword(event.target.value)} />
+                  <button className="icon-button" type="button" aria-label={visible ? "隱藏密碼" : "顯示密碼"}
+                    onClick={() => setVisible(!visible)}>
+                    {visible ? <EyeOff size={20} aria-hidden="true" /> : <Eye size={20} aria-hidden="true" />}
+                  </button>
+                </div>
               </div>
               {error && <Notice error>{error}</Notice>}
-              <button className="button primary" type="submit" disabled={busy || !code}>
-                <LockKeyhole size={18} aria-hidden="true" />{busy ? "正在開啟…" : "開啟衣櫃"}
+              <button className="button primary" type="submit" disabled={busy || !email || !password}>
+                <LockKeyhole size={18} aria-hidden="true" />{busy ? "登入中…" : "登入"}
               </button>
             </form>
-          ) : <Notice>請確認 Vercel Production 已設定 DRESS_ACCESS_CODE，並重新部署。</Notice>}
+          ) : <Notice>請確認 Vercel Production 已設定 Supabase 專案 URL 與 Publishable key。</Notice>}
         </div>
       </section>
     </main>

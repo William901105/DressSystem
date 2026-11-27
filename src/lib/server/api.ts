@@ -29,7 +29,7 @@ function sameOrigin(request: Request) {
 export function api(handler: (request: Request) => Promise<unknown>, options = { protected: true }) {
   return async (request: Request) => {
     try {
-      if (options.protected && !(await hasAccess())) throw new ApiError(401, "請重新輸入衣櫃存取碼。");
+      if (options.protected && !(await hasAccess())) throw new ApiError(401, "請重新登入衣櫃。");
       if (!["GET", "HEAD"].includes(request.method) && !sameOrigin(request)) throw new ApiError(403, "此請求來源無法使用。");
       const result = await handler(request);
       return result instanceof Response ? result : json(result);

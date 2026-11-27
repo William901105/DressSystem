@@ -5,36 +5,14 @@ import { redirect } from "next/navigation";
 import { PHOTO_BUCKET } from "@/lib/models";
 import { requirePageAccess } from "./access";
 import { ApiError } from "./api";
-
-function supabaseOrigin(value: string | undefined) {
-  if (!value) return null;
-  try {
-    const url = new URL(value.trim());
-    if (url.protocol === "https:" || (url.protocol === "http:" && ["localhost", "127.0.0.1"].includes(url.hostname))) {
-      return url.origin;
-    }
-  } catch {
-    return null;
-  }
-  return null;
-}
-
-function supabaseKey(value: string | undefined, prefix: string) {
-  const key = value?.trim();
-  return key && key.startsWith(prefix) && key.length > prefix.length ? key : null;
-}
+import { authenticationSettings, supabaseKey } from "./supabase-settings";
 
 export function databaseSettings() {
-  const url = supabaseOrigin(process.env.NEXT_PUBLIC_SUPABASE_URL);
-  const publishableKey = supabaseKey(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, "sb_publishable_");
+  const { config, invalid } = authenticationSettings();
   const secretKey = supabaseKey(process.env.SUPABASE_SECRET_KEY, "sb_secret_");
   return {
-    config: url && publishableKey && secretKey ? { url, publishableKey, secretKey } : null,
-    invalid: [
-      ...(!url ? ["NEXT_PUBLIC_SUPABASE_URL"] : []),
-      ...(!publishableKey ? ["NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"] : []),
-      ...(!secretKey ? ["SUPABASE_SECRET_KEY"] : []),
-    ],
+    config: config && secretKey ? { ...config, secretKey } : null,
+    invalid: secretKey ? invalid : [...invalid, "SUPABASE_SECRET_KEY"],
   };
 }
 

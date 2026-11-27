@@ -1,8 +1,10 @@
 "use client";
 
-import { ClipboardList, LayoutGrid, Shirt, Tags, WandSparkles } from "lucide-react";
+import { ClipboardList, LayoutGrid, LogOut, Shirt, Tags, WandSparkles } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { errorMessage, send } from "@/lib/client";
 
 const links = [
   { href: "/", text: "衣櫃", icon: LayoutGrid },
@@ -13,6 +15,21 @@ const links = [
 
 export function Navigation() {
   const pathname = usePathname();
+  const [signingOut, setSigningOut] = useState(false);
+  const [error, setError] = useState("");
+
+  async function signOut() {
+    setSigningOut(true);
+    setError("");
+    try {
+      await send("/api/access", "DELETE", {});
+      window.location.replace("/access");
+    } catch (cause) {
+      setError(errorMessage(cause));
+      setSigningOut(false);
+    }
+  }
+
   return (
     <aside className="rail">
       <Link href="/" className="brand" aria-label="DressSystem 衣櫃">
@@ -27,6 +44,12 @@ export function Navigation() {
           </Link>
         ))}
       </nav>
+      <div className="rail-exit">
+        <button type="button" className="button rail-sign-out" onClick={signOut} disabled={signingOut}>
+          <LogOut size={18} aria-hidden="true" />{signingOut ? "登出中…" : "登出"}
+        </button>
+        {error && <p className="rail-error" role="alert">{error}</p>}
+      </div>
     </aside>
   );
 }

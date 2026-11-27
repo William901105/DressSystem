@@ -1,14 +1,15 @@
 import { redirect } from "next/navigation";
 import { AccessForm } from "@/components/access-form";
-import { configuredAccessCode, hasAccess } from "@/lib/server/access";
+import { hasAccess } from "@/lib/server/access";
 import { databaseSettings } from "@/lib/server/database";
+import { authenticationSettings } from "@/lib/server/supabase-settings";
 
 export const dynamic = "force-dynamic";
 
 export default async function AccessPage({ searchParams }: {
   searchParams: Promise<{ setup?: string | string[] }>;
 }) {
-  if (!(await hasAccess())) return <AccessForm configured={Boolean(configuredAccessCode())} />;
+  if (!(await hasAccess())) return <AccessForm configured={Boolean(authenticationSettings().config)} />;
 
   const { invalid } = databaseSettings();
   const { setup } = await searchParams;
